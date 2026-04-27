@@ -97,6 +97,7 @@ export const setupDataRoutes = (app: any) => {
     }
   });
 
+  // Import Endpoint (Non-blocking)
   app.post('/api/data/import', upload.single('file'), async (req: Request, res: Response) => {
     if (!req.file) {
       return res.status(400).json({ success: false, message: 'No file uploaded' });
@@ -115,59 +116,61 @@ export const setupDataRoutes = (app: any) => {
       message: 'Processing file...'
     };
 
-    try {
-      console.log('--- Import Started ---');
-      const workbook = xlsx.read(req.file.buffer, { type: 'buffer' });
-      const results: any = {};
+    // Run in background to prevent timeout
+    (async () => {
+      try {
+        console.log('--- Background Import Started ---');
+        const workbook = xlsx.read(req.file!.buffer, { type: 'buffer' });
+        const results: any = {};
 
-      for (const sheetName of workbook.SheetNames) {
-        const data = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
-        if (data.length === 0) continue;
+        for (const sheetName of workbook.SheetNames) {
+          const data = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
+          if (data.length === 0) continue;
 
-        console.log(`Processing ${data.length} rows from sheet: ${sheetName}`);
-        importStatus.message = `Processing ${sheetName}...`;
+          console.log(`Processing ${data.length} rows from sheet: ${sheetName}`);
+          importStatus.message = `Processing ${sheetName}...`;
 
-        switch (sheetName.toLowerCase()) {
-          case 'students':
-            results.students = await ingestStudents(data);
-            break;
-          case 'infrastructure':
-            results.infrastructure = await ingestInfrastructure(data);
-            break;
-          case 'faculty':
-            results.faculty = await ingestFaculty(data);
-            break;
-          case 'courses':
-            results.courses = await ingestCourses(data);
-            break;
-          case 'student enrollment':
-          case 'student_enrollment':
-            results.enrollments = await ingestEnrollments(data);
-            break;
-          case 'teachers-subjects':
-          case 'teacher_subjects':
-            results.teacherSubjects = await ingestTeacherSubjects(data);
-            break;
-          default:
-            console.log(`Skipping unknown sheet: ${sheetName}`);
+          switch (sheetName.toLowerCase()) {
+            case 'students':
+              results.students = await ingestStudents(data);
+              break;
+            case 'infrastructure':
+              results.infrastructure = await ingestInfrastructure(data);
+              break;
+            case 'faculty':
+              results.faculty = await ingestFaculty(data);
+              break;
+            case 'courses':
+              results.courses = await ingestCourses(data);
+              break;
+            case 'student enrollment':
+            case 'student_enrollment':
+              results.enrollments = await ingestEnrollments(data);
+              break;
+            case 'teachers-subjects':
+            case 'teacher_subjects':
+              results.teacherSubjects = await ingestTeacherSubjects(data);
+              break;
+            default:
+              console.log(`Skipping unknown sheet: ${sheetName}`);
+          }
         }
+
+        importStatus.isImporting = false;
+        importStatus.progress = 100;
+        importStatus.message = 'Import complete!';
+        console.log('--- Background Import Finished ---');
+      } catch (err: any) {
+        console.error('Background Import Failed:', err);
+        importStatus.isImporting = false;
+        importStatus.message = `Error: ${err.message}`;
       }
+    })();
 
-      importStatus.isImporting = false;
-      importStatus.progress = 100;
-      importStatus.message = 'Import complete!';
-
-      res.json({ 
-        success: true, 
-        message: 'Import complete!',
-        details: results
-      });
-    } catch (err: any) {
-      console.error(err);
-      importStatus.isImporting = false;
-      importStatus.message = `Error: ${err.message}`;
-      res.status(500).json({ success: false, message: `Error parsing spreadsheet: ${err.message}` });
-    }
+    res.json({ 
+      success: true, 
+      message: 'Import started in background. Monitor progress in the dashboard.'
+    });
   });
 };
 
