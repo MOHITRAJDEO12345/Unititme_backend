@@ -1,4 +1,5 @@
 eduniketan-middleware/.env
+eduniketan-middleware/.env.local
 eduniketan-middleware/.env.example
 node_modules/
 .env
