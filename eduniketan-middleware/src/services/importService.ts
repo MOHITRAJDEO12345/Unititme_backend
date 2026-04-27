@@ -79,6 +79,7 @@ export const setupDataRoutes = (app: any) => {
     
     console.log('--- API Cleanup Started ---');
     try {
+      // 1. Clear Database Tables
       for (const table of tables) {
         let query = supabase.from(table).delete();
         if (table === 'students' || table === 'student_enrollments') query = query.neq('student_id', '-1');
@@ -90,7 +91,26 @@ export const setupDataRoutes = (app: any) => {
         const { error } = await query;
         if (error) throw error;
       }
-      res.json({ success: true, message: 'Database cleared successfully' });
+
+      // 2. Clear Storage Bucket (institutional-data)
+      const { data: files, error: listError } = await supabase.storage
+        .from('institutional-data')
+        .list('uploads');
+
+      if (!listError && files && files.length > 0) {
+        const paths = files.map(f => `uploads/${f.name}`);
+        const { error: deleteError } = await supabase.storage
+          .from('institutional-data')
+          .remove(paths);
+        
+        if (deleteError) {
+          console.error('Storage cleanup failed:', deleteError.message);
+        } else {
+          console.log(`Deleted ${paths.length} files from storage.`);
+        }
+      }
+
+      res.json({ success: true, message: 'Database and storage cleared successfully' });
     } catch (err: any) {
       console.error('Cleanup failed:', err);
       res.status(500).json({ success: false, message: err.message });
