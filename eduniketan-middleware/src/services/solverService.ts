@@ -56,6 +56,14 @@ export class SolverService {
   private rooms: Room[] = [];
   private sections: Section[] = [];
   private constraints: SolverConstraints | null = null;
+  public status = {
+    isSolving: false,
+    progress: 0,
+    message: 'Idle',
+    currentTask: '',
+    totalTasks: 0,
+    processedTasks: 0
+  };
   private readonly timeSlots = [
     '09:00 AM - 09:50 AM',
     '10:00 AM - 10:50 AM',
@@ -282,6 +290,9 @@ export class SolverService {
   
   async loadData() {
     const constraints = await this.getConstraints();
+    this.status.isSolving = true;
+    this.status.progress = 0;
+    this.status.message = 'Loading data from Supabase...';
     // 1. Fetch all required datasets (paginated; Supabase API row cap is 1000 per request)
     const [
       roomsData,
@@ -435,6 +446,9 @@ export class SolverService {
   async runSolver() {
     this.constraints = await getSolverConstraints();
     const constraints = await this.getConstraints();
+    this.status.isSolving = true;
+    this.status.progress = 5;
+    this.status.message = 'Initialized Advanced Weekly Solver...';
     console.log(`Starting Advanced Weekly Solver...`);
     console.log(`- Sections: ${this.sections.length}`);
     console.log(`- Rooms: ${this.rooms.length}`);
@@ -531,6 +545,10 @@ export class SolverService {
         });
       }
     }
+    
+    this.status.totalTasks = jobs.length;
+    this.status.processedTasks = 0;
+    this.status.message = `Scheduling ${jobs.length} sessions...`;
 
     const makeRng = (seed: number) => {
       let state = (seed >>> 0) || 1;
@@ -658,6 +676,12 @@ export class SolverService {
         blockUsage.set(room.building, (blockUsage.get(room.building) || 0) + 1);
         scheduled.set(job.id, { job, day, slot, room });
         teacherSessionLoad.set(job.teacher.teacher_id, (teacherSessionLoad.get(job.teacher.teacher_id) || 0) + 1);
+        
+        this.status.processedTasks++;
+        this.status.progress = Math.round(5 + (this.status.processedTasks / this.status.totalTasks) * 90);
+        if (this.status.processedTasks % 100 === 0) {
+            this.status.message = `Scheduled ${this.status.processedTasks} / ${this.status.totalTasks} sessions...`;
+        }
       };
 
       // Safe reserve: validates ALL constraints before placing. Returns false if any conflict.
@@ -1141,6 +1165,9 @@ export class SolverService {
       }
     }
     
+    this.status.isSolving = false;
+    this.status.progress = 100;
+    this.status.message = 'Solver Completed Successfully!';
     return totalSessionsPlaced;
   }
 }

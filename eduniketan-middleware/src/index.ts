@@ -129,16 +129,30 @@ app.get('/api/directory/:type', async (req, res) => {
   }
 });
 
-// Solver Trigger
+// Solver Progress Endpoint
+app.get('/api/solver/status', (req, res) => {
+  res.json(solver.status);
+});
+
+// Solver Trigger (Non-blocking)
 app.post('/api/solver/trigger', async (req, res) => {
-  try {
-    await solver.loadData();
-    const count = await solver.runSolver();
-    res.json({ success: true, message: `Solver completed! Generated ${count} assignments.` });
-  } catch (err: any) {
-    console.error(err);
-    res.status(500).json({ success: false, message: err.message });
+  if (solver.status.isSolving) {
+    return res.status(400).json({ success: false, message: 'Solver is already running' });
   }
+
+  // Run in background
+  (async () => {
+    try {
+      await solver.loadData();
+      await solver.runSolver();
+    } catch (err: any) {
+      console.error('Background solver failed:', err);
+      solver.status.isSolving = false;
+      solver.status.message = `Failed: ${err.message}`;
+    }
+  })();
+
+  res.json({ success: true, message: 'Solver started in background' });
 });
 
 // Solver Constraints
