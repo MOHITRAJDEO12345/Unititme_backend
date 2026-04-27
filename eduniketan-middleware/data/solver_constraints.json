@@ -1,0 +1,28 @@
+{
+  "zeroBufferTransit": true,
+  "byodIsolation": true,
+  "buildingAffinityMode": "batch",
+  "strictTeacherQualification": true,
+  "allowUnqualifiedTeacherFallback": false,
+  "maxLectureSectionSize": 71,
+  "maxLabSectionSize": 30,
+  "enableSaturdayMakeup": true,
+  "maxTeacherSessionsPerWeek": 48,
+  "enforceTeacherLoadInRepair": true,
+  "maxRelocationBlockers": 6,
+  "maxRoomCandidatesPerTime": 24,
+  "maxRepairSectionsPerAttempt": 25,
+  "allowForbiddenSlotSoftening": true,
+  "cohortGranularity": "exact_course_set",
+  "minCourseSetCohortSize": 1,
+  "maxDailyStudentHours": 6,
+  "maxDailyTeacherHours": 6,
+  "mandatoryLunchBreak": true,
+  "lunchBreakSlots": [
+    "12:00 PM - 12:50 PM",
+    "01:10 PM - 02:00 PM",
+    "02:10 PM - 03:00 PM"
+  ],
+  "maxDayScholarGap": 3,
+  "minimizeTeachers": true
+}

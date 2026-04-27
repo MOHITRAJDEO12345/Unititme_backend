@@ -1,0 +1,28 @@
+DATA INGESTION PIPELINE (EXCEL-TO-SUPABASE)
+=========================================
+
+To handle LPU-scale data (1,000 students), an automated ingestion service 
+was developed.
+
+SUPPORTED EXCEL SHEETS:
+-----------------------
+1. students: Basic profiles, BYOD status, and backlog history.
+2. infrastructure: Building-room mapping, capacity, and equipment.
+3. faculty: Teacher profiles and expertise tags.
+4. courses: Subject codes, credits, and session durations.
+5. student_enrollment: Mapping of Students to specific subjects.
+6. teacher_subjects: Mapping of Teachers to their qualified subjects.
+
+INGESTION RULES:
+----------------
+- Idempotency: Uses "Upsert" logic. Re-uploading the same ID updates the record 
+  instead of creating a duplicate.
+- Formatting: Automatic conversion of Boolean strings ("True" -> true) and 
+  JSON strings (Array conversion).
+- Security: Uses SUPABASE_SERVICE_ROLE_KEY to bypass RLS during bulk ingestion 
+  to ensure 100% data integrity.
+
+VALIDATION:
+-----------
+A diagnostic script `inspect_excel.ts` was implemented to verify Excel columns 
+before ingestion starts.

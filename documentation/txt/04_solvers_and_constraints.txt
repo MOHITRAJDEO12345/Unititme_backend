@@ -1,0 +1,31 @@
+SOLVER & CONSTRAINTS IMPLEMENTATION
+===================================
+
+The high-fidelity solver replaced previous simulations with a real constraint 
+satisfaction algorithm implemented in TypeScript.
+
+ENFORCED CONSTRAINTS:
+---------------------
+1. HARD: Room Capacity
+   - Sections are automatically split into ~60 student chunks.
+   - Rooms are assigned only if capacity >= enrollment count.
+
+2. HARD: Non-Conflict Time Slot
+   - No room can be assigned two sessions at the same time.
+   - Master conflict matrix: "room_id | day | slot" must be unique.
+
+3. SOFT: Building Affinity
+   - Prioritizes LPU buildings 25, 26, 27, 28, 38, 36, 34, 33, 37.
+   - Specialized handling for Building 37 (classes start from 6th floor).
+
+4. SOFT: Teacher-Subject Pairing
+   - Matches sections to faculty based on expertise tags stored in Supabase.
+
+SOLVER LOGIC:
+-------------
+1. Load all Infrastructure, Faculty, and Course Enrollments.
+2. Group students into Sections (max 60 per section).
+3. For each section:
+   - Identify compatible rooms (Capacity + Type).
+   - Search for the first available time slot (Mon-Fri, 9 slots/day).
+   - Commit assignment to Supabase.

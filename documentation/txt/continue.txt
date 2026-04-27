@@ -1,0 +1,42 @@
+SESSION RESUMPTION CONTEXT (continue.txt)
+=====================================
+
+PROJECT: Eduniketan Allocation Engine
+DATE: 2026-04-23
+STATUS: Production Ready / High-Fidelity Solver Integrated
+
+1. KEY REPOSITORIES:
+--------------------
+- Middleware: /home/anon/Pictures/ums_timetable/eduniketan-middleware (Port 4000)
+- Dashboard: /home/anon/Pictures/ums_timetable/eduniketan-dashboard (Port 5173)
+
+2. SYSTEM SETUP:
+----------------
+- Database: Supabase (URL and Keys in eduniketan-middleware/.env)
+- Key Config: supabase.ts uses Service Role Key to bypass RLS for data loading.
+- Current Dataset: 1,000 students / 912 rooms ( Buildings 25-38).
+
+3. RECENT ACTIONS:
+------------------
+- Successfully migrated Supabase schema to include courses, enrollments, and teacher mappings.
+- Replaced solver simulations with a real TypeScript constraint engine.
+- Generated and ingested production sample data.
+- Verified filtered views (Student STU0001) are pulling live Supabase assignments.
+
+4. ENDPOINTS TO WATCH:
+----------------------
+- POST /api/data/import: Upload Excel for full ingestion.
+- POST /api/solver/trigger: Runs the high-fidelity constraint solver.
+- GET /api/solver/solution: Returns the current master timetable.
+- GET /api/solver/solution/student/:id: Personalized student schedule.
+
+5. NEXT STEPS (REMAINING IDEAS):
+--------------------------------
+- Implement manual constraint adjustment UI (Admins).
+- Add "Travel Time" constraint to the solver algorithm.
+- Export solved timetable back to Excel format.
+
+FOR NEW CHAT:
+-------------
+Read the `documentation/txt/` folder to regain the full architectural context 
+and current verification results.

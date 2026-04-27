@@ -1,0 +1,28 @@
+SYSTEM ARCHITECTURE OVERVIEW
+============================
+
+The system follows a Three-Tier Architecture optimized for high-performance 
+scheduling tasks.
+
+1. DATA LAYER (Supabase)
+------------------------
+- Core Postgres database storing Entities (Students, Faculty, Infrastructure).
+- Relationship tables for Enrollment and Teacher-Subject mappings.
+- Master Timetable table which serves as the "Source of Truth" for the frontend.
+
+2. LOGIC LAYER (Middleware - Node.js/TypeScript)
+------------------------------------------------
+- Solver Engine: A high-fidelity constraint satisfaction service.
+- Ingestion Pipeline: An automated Excel-to-Supabase translator.
+- REST API: Exposes master and filtered schedules via /api/solver/solution.
+
+3. PRESENTATION LAYER (Dashboard - Vite/React)
+-----------------------------------------------
+- Real-time Analytics: Visualizes room utilization and conflict rates.
+- Constraint Manager: interface for defining "Zero-Buffer Transit" and "BYOD" rules.
+- Filtered Timetables: Granular views for personalized user experiences.
+
+COMMUNICATION FLOW:
+-------------------
+Excel Upload -> Middleware Ingestion -> Supabase Persistence -> 
+Solver Execution -> Master Timetable Update -> Dashboard Visualization.

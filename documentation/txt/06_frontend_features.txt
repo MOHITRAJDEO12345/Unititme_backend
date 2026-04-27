@@ -1,0 +1,26 @@
+FRONTEND FEATURES & UI CAPABILITIES
+==================================
+
+The dashboard was redesigned for Personalized Scheduling.
+
+1. PERSONALIZED VIEWS:
+----------------------
+- Student View: Enter StudentID (e.g. STU0001) to see exactly what classes 
+  they must attend based on their enrollment.
+- Teacher View: Enter TeacherName to see their daily lecture schedule.
+- Room View: Enter RoomID (e.g. 25-102) to see utilization of that physical space.
+
+2. CONSTRAINT MATRIX UI:
+------------------------
+- Admins can define global policies (Zero-Buffer Transit, BYOD Isolation).
+- Visual feedback on conflict rates (e.g. 0.0% conflict achieved).
+
+3. MASTER ANALYTICS:
+--------------------
+- Overview cards for total Student count, Room count, and Average Utilization.
+- Real-time sync with Supabase `master_timetable` records.
+
+TECHNOLOGY STACK:
+-----------------
+React, Vite, TailwindCSS (for utility styling), Lucide-React (Icons), 
+and Supabase-JS.

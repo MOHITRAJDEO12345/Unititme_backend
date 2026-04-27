@@ -1,0 +1,8 @@
+eduniketan-middleware/.env
+eduniketan-middleware/.env.example
+node_modules/
+.env
+*.xlsx
+dist/
+.DS_Store
+.vscode/

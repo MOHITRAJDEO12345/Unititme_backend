@@ -1,0 +1,49 @@
+DATABASE SCHEMA DEFINITION
+==========================
+
+The production schema was established in Supabase to support the 1,000-student 
+real data run.
+
+TABLE: students
+---------------
+- student_id (PK)
+- name
+- program (LPU Batch)
+- is_byod (Boolean)
+- backlog_courses (Array)
+
+TABLE: infrastructure
+---------------------
+- room_id (PK, format: 25-101)
+- block_id (Buildings 25-38)
+- capacity_lecture
+- room_type (Theory/Lab)
+- is_byod_ready
+
+TABLE: faculty
+--------------
+- teacher_id (PK)
+- name
+- expertise_tags (Array)
+- max_teaching_hours_day
+
+TABLE: courses
+--------------
+- course_id (PK)
+- course_name
+- credit_hours
+
+TABLE: student_enrollments (M-2-M)
+----------------------------------
+- student_id (FK)
+- course_id (FK)
+- semester
+
+TABLE: master_timetable (Solution)
+----------------------------------
+- course_code
+- section_name
+- time_slot (Format: Day 09:00 - 10:30)
+- room_id (FK)
+- instructor_name
+- student_ids (Array of enrolled students for conflict check)

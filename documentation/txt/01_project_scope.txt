@@ -1,0 +1,23 @@
+EDUNIKETAN ALLOCATION ENGINE - PROJECT SCOPE
+==========================================
+
+OBJECTIVE:
+----------
+Transition the Eduniketan Allocation Engine from a simulation-based demonstration 
+to a production-ready system capable of optimizing schedules for a 1,000-student 
+LPU population using real-world constraints.
+
+CORE CHALLENGES ADDRESSED:
+--------------------------
+1. Scaling: Moving from mock data to a 1,000-student dataset.
+2. Realism: Implementing a high-fidelity constraint solver that satisfies 
+   complex enrollment and infrastructural rules.
+3. Logistics: Handling specific LPU building affinities (Buildings 25-38), 
+   floor-specific constraints (Building 37 6th floor+), and room sequences.
+4. Visibility: Providing personalized timetable views for Students (enrollment-driven), 
+   Teachers (expertise-driven), and Rooms (capacity-driven).
+
+KEY PHILOSOPHY:
+---------------
+"Moving from Simulation to Reality." Every schedule produced is now 
+back-checked against actual Supabase records rather than generated on-the-fly.
