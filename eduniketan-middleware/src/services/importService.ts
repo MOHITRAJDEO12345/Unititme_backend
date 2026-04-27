@@ -99,8 +99,8 @@ export const setupDataRoutes = (app: any) => {
 
   // Import Endpoint (Non-blocking)
   app.post('/api/data/import', upload.single('file'), async (req: Request, res: Response) => {
-    if (!req.file) {
-      return res.status(400).json({ success: false, message: 'No file uploaded' });
+    if (!req.file && !req.body.storagePath) {
+      return res.status(400).json({ success: false, message: 'No file uploaded or storage path provided' });
     }
 
     if (importStatus.isImporting) {
@@ -120,7 +120,23 @@ export const setupDataRoutes = (app: any) => {
     (async () => {
       try {
         console.log('--- Background Import Started ---');
-        const workbook = xlsx.read(req.file!.buffer, { type: 'buffer' });
+        let buffer: Buffer;
+
+        if (req.body.storagePath) {
+          console.log(`Downloading file from Supabase Storage: ${req.body.storagePath}`);
+          const { data, error } = await supabase.storage
+            .from('institutional-data')
+            .download(req.body.storagePath);
+          
+          if (error) throw new Error(`Supabase Storage download failed: ${error.message}`);
+          buffer = Buffer.from(await data.arrayBuffer());
+        } else if (req.file) {
+          buffer = req.file.buffer;
+        } else {
+          throw new Error('No file data provided');
+        }
+
+        const workbook = xlsx.read(buffer, { type: 'buffer' });
         const results: any = {};
 
         for (const sheetName of workbook.SheetNames) {
